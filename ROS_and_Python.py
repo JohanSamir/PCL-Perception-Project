@@ -27,7 +27,20 @@ class image_converter:
     cv_image = self.image_method(cv_image)
 
     is_bgr = len(cv_image.shape) == 3
+   
+    try:
+      if is_bgr:
+        self.image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, "bgr8"))
+      else:
+        self.image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, "mono8"))
+    except CvBridgeError as e:
+      print(e)
 
+  def image_method(self, img):   
+
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    return gray
 
 
 
