@@ -44,3 +44,12 @@ class synchronizer:
         #cloud_points = np.empty((pc2_msg.width, 3))
         Xg = pc2c.read_points(cloud_out, skip_nans=True, field_names=("x", "y", "z"))
         cloud_points = np.empty((cloud_out.width, 3))
+
+        # a = 0
+        # for p in Xg:
+        #     cloud_points[a, 0] = p[0]
+        #     cloud_points[a, 1] = p[1]
+        #     cloud_points[a, 2] = p[2]
+
+        # np.save(outfile, x)
+        # np.save("/home/johan/Desktop/Jackal/pointcloud/"+nombre_img,cv_image)
