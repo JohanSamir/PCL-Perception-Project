@@ -1,0 +1,17 @@
+<launch>
+
+ <node
+    pkg="learnManuel"
+    type="image_node_example_2.py"
+    name="image_example_node"
+    />
+
+
+    <node pkg="pcl_ros" type="pointcloud_to_pcd" name="pc2pcd" output="screen">
+        <!--remap from="prefix" to="/home/pdcfiles" /-->
+        <remap from="input" to="/pointcloud_esta_SI" />
+		
+    </node>
+
+
+</launch>
