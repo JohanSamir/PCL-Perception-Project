@@ -53,3 +53,21 @@ class synchronizer:
 
         # np.save(outfile, x)
         # np.save("/home/johan/Desktop/Jackal/pointcloud/"+nombre_img,cv_image)
+
+        
+
+def main(args):
+  print("aaaaaaaaaaaaaaaaaa")
+  print "aaaaaaaaaaaaaaaaaa"
+  rospy.init_node('sync_node', anonymous=True)
+  rospy.loginfo("sync_node on")
+  sc = synchronizer()
+  
+  try:
+    rospy.spin()
+  except KeyboardInterrupt:
+    print("Shutting down")
+
+if __name__ == '__main__':
+	
+    main(sys.argv)
