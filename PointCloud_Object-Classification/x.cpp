@@ -77,6 +77,35 @@ void borrar_caracter(const char* cadena)
     fs.close();
 }
 
+int
+main (int argc, char** argv)
+{
+  
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2(new pcl::PointCloud<pcl::PointXYZ>);
+  pcl::PointCloud<pcl::PointXYZ>::Ptr suelo (new pcl::PointCloud<pcl::PointXYZ>);
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_in (new pcl::PointCloud<pcl::PointXYZ>);
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_out (new pcl::PointCloud<pcl::PointXYZ>);
+    pcl::PointCloud<pcl::PointXYZINormal>::Ptr cloud_with_normals (new pcl::PointCloud<pcl::PointXYZINormal>);
+
+
+    pcl::IndicesClustersPtr clusters (new pcl::IndicesClusters);
+    
+
+    pcl::console::TicToc tt;
+  pcl::PCDWriter writer;
+
+  
+  std::cerr << "Loading Point Cloud...\n", tt.tic ();
+  /*if (pcl::io::loadPCDFile<pcl::PointXYZ>(argv[1], *cloud) != 0)
+  {
+    return -1;
+  }*/
+    ////////// LEER ARCHIVOS PCD Y PLY ////////////
+    std::vector<int> filenames;
+    bool file_is_pcd = false;
+
+    filenames = pcl::console::parse_file_extension_argument (argc, argv, ".ply");
 
 
 
