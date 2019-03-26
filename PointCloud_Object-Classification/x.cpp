@@ -77,37 +77,39 @@ void borrar_caracter(const char* cadena)
     fs.close();
 }
 
+
+
 int
 main (int argc, char** argv)
 {
-  
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2(new pcl::PointCloud<pcl::PointXYZ>);
-  pcl::PointCloud<pcl::PointXYZ>::Ptr suelo (new pcl::PointCloud<pcl::PointXYZ>);
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_in (new pcl::PointCloud<pcl::PointXYZ>);
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_out (new pcl::PointCloud<pcl::PointXYZ>);
-    pcl::PointCloud<pcl::PointXYZINormal>::Ptr cloud_with_normals (new pcl::PointCloud<pcl::PointXYZINormal>);
+	
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2(new pcl::PointCloud<pcl::PointXYZ>);
+	pcl::PointCloud<pcl::PointXYZ>::Ptr suelo (new pcl::PointCloud<pcl::PointXYZ>);
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_in (new pcl::PointCloud<pcl::PointXYZ>);
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_out (new pcl::PointCloud<pcl::PointXYZ>);
+  	pcl::PointCloud<pcl::PointXYZINormal>::Ptr cloud_with_normals (new pcl::PointCloud<pcl::PointXYZINormal>);
 
 
-    pcl::IndicesClustersPtr clusters (new pcl::IndicesClusters);
-    
+  	pcl::IndicesClustersPtr clusters (new pcl::IndicesClusters);
+  	
 
-    pcl::console::TicToc tt;
-  pcl::PCDWriter writer;
+  	pcl::console::TicToc tt;
+	pcl::PCDWriter writer;
 
-  
-  std::cerr << "Loading Point Cloud...\n", tt.tic ();
-  /*if (pcl::io::loadPCDFile<pcl::PointXYZ>(argv[1], *cloud) != 0)
-  {
-    return -1;
-  }*/
-    ////////// LEER ARCHIVOS PCD Y PLY ////////////
-    std::vector<int> filenames;
-    bool file_is_pcd = false;
+	
+	std::cerr << "Loading Point Cloud...\n", tt.tic ();
+	/*if (pcl::io::loadPCDFile<pcl::PointXYZ>(argv[1], *cloud) != 0)
+	{
+		return -1;
+	}*/
+  	////////// LEER ARCHIVOS PCD Y PLY ////////////
+  	std::vector<int> filenames;
+  	bool file_is_pcd = false;
 
-    filenames = pcl::console::parse_file_extension_argument (argc, argv, ".ply");
+  	filenames = pcl::console::parse_file_extension_argument (argc, argv, ".ply");
 
-    if (filenames.size () != 1)  
+  	if (filenames.size () != 1)  
 	{
     		filenames = pcl::console::parse_file_extension_argument (argc, argv, ".pcd");
 
@@ -146,7 +148,7 @@ main (int argc, char** argv)
 	passfilter.setFilterLimits(0.2, 2.0);
 	passfilter.filter(*cloud_in);
 
-	/*	
+/*	
 	std::cerr << ">> Done: " << tt.toc () << " ms, " << cloud->points.size () << " points\n";
 
 	std::cerr << "Segmentation floor...\n", tt.tic ();
@@ -215,8 +217,834 @@ main (int argc, char** argv)
   	ec.extract (cluster_indices);
 
 
+  	int j = 1;
+
+  	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZ>);
+	
+    for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it)
+    {
+	cloud_cluster->clear();
+        for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); ++pit)
+      
+        cloud_cluster->points.push_back (cloud_out->points[*pit]); 
+        cloud_cluster->width = cloud_cluster->points.size ();
+        cloud_cluster->height = 1;
+        cloud_cluster->is_dense = true;
+        
+        /*std::stringstream ss;
+        ss << "cluster_" << j << ".pcd";
+        writer.write<pcl::PointXYZ> (ss.str (), *cloud_cluster, false); */
+    	std::cout << "Cluster: "<< j << cloud_cluster->points.size () << " points." << std::endl;
+        ++j;            
+    }
+
+  	std::cerr << ">> Done: " << tt.toc () << " ms\n";
+
+	//Para cambiar el tipo de nube de puntos
+  	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudRGB(new pcl::PointCloud<pcl::PointXYZRGB>); 
+  	pcl::copyPointCloud(*cloud_out,*cloudRGB);
 
 
 
+	std::cerr << "Coloring Clusters...\n", tt.tic (); 
 
+    	pcl::PointCloud<pcl::PointXYZRGB>::Ptr color_cloud (new pcl::PointCloud<pcl::PointXYZRGB>);  
+    	std::vector<unsigned char> colors;
+
+    	for (size_t i_segment = 0; i_segment < cluster_indices.size (); i_segment++)
+    	{
+      		colors.push_back (static_cast<unsigned char> (rand () % 256));
+      		colors.push_back (static_cast<unsigned char> (rand () % 256));
+      		colors.push_back (static_cast<unsigned char> (rand () % 256));
+    	}
+
+    	color_cloud->width = cloudRGB->width;
+    	color_cloud->height = cloudRGB->height;
+    	color_cloud->is_dense = cloudRGB->is_dense;
+
+
+	//Para cambiar el tipo de nube de puntos
+    	for (size_t i_point = 0; i_point < cloudRGB->points.size (); i_point++)
+    	{
+      	pcl::PointXYZRGB point;
+      	point.x = *(cloudRGB->points[i_point].data);
+      	point.y = *(cloudRGB->points[i_point].data + 1);
+      	point.z = *(cloudRGB->points[i_point].data + 2);
+      	point.r = 255;
+      	point.g = 255;
+      	point.b = 255;
+      	color_cloud->points.push_back (point);
+    	}
+
+    	std::vector< pcl::PointIndices >::iterator i_segment;
+    	int sig_color = 0;
+
+    	for (i_segment = cluster_indices.begin (); i_segment != cluster_indices.end (); i_segment++)
+    	{
+      		std::vector<int>::iterator i_point;
+
+      		for (i_point = i_segment->indices.begin (); i_point != i_segment->indices.end (); i_point++)
+      		{
+        		int index;
+        		index = *i_point;
+        		color_cloud->points[index].r = colors[3 * sig_color];
+        		color_cloud->points[index].g = colors[3 * sig_color + 1];
+        		color_cloud->points[index].b = colors[3 * sig_color + 2];
+      		}
+      		sig_color++;
+    	}
+	
+
+
+	std::cerr << ">> Done: " << tt.toc () << " ms\n";
+
+	std::cerr << "VFH...\n", tt.tic (); 
+	
+
+	int sig_normal = 0;
+
+	std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> points_cluster;//asi
+	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> normals;
+
+	int cant=1;
+	for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it)
+  	{
+    	pcl::PointCloud<pcl::PointXYZ>::Ptr cluster (new pcl::PointCloud<pcl::PointXYZ>);
+	
+		for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); ++pit)
+    	
+		cluster->points.push_back (cloud_out->points[*pit]); 
+   		cluster->width = cloud_cluster->points.size ();
+   		cluster->height = 1;
+   		cluster->is_dense = true;
+
+		points_cluster.push_back(cluster);//guardar cada cluster en una posicion de un vector (save)		
+		std::cout << "Cluster "<< cant << ": " << cluster->points.size () << " data points." << std::endl;
+		++cant;
+	}
+
+	std::cout << "Cluster: "<< points_cluster.size() << std::endl;
+
+	std::vector<pcl::PointCloud<pcl::Normal>::Ptr> extractedNormals;
+	//pcl::PointCloud<pcl::Normal>::Ptr cluster_normals(new pcl::PointCloud<pcl::Normal>);
+	
+	for(size_t i = 0; i < points_cluster.size(); ++i)
+    	{      	
+		pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> normalEstimation;
+
+		normalEstimation.setInputCloud((points_cluster[i]));
+		
+
+  		pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ> ());
+  		normalEstimation.setSearchMethod (tree);
+		pcl::PointCloud<pcl::Normal>::Ptr cluster_normals (new pcl::PointCloud<pcl::Normal>);
+		normalEstimation.setRadiusSearch(0.03);
+		
+		normalEstimation.compute(*cluster_normals);
+
+		extractedNormals.push_back(cluster_normals);
+	}
+	
+	
+	//Se genera el vector flotante para almacenar uno por uno los valores del histograma
+	std::vector <std::vector <float> > datos;
+	datos = crear_matriz(points_cluster.size(),308);
+
+
+	for(size_t i = 0; i < points_cluster.size(); ++i)
+    	{
+      		pcl::PointCloud<pcl::VFHSignature308>::Ptr descriptor(new pcl::PointCloud<pcl::VFHSignature308>);
+
+      		pcl::VFHEstimation<pcl::PointXYZ, pcl::Normal, pcl::VFHSignature308> vfh;
+
+		vfh.setInputCloud((points_cluster[i]));
+		vfh.setInputNormals((extractedNormals[i]));
+
+		pcl::search::KdTree<pcl::PointXYZ>::Ptr kdtree (new pcl::search::KdTree<pcl::PointXYZ> ());
+		vfh.setSearchMethod(kdtree);
+
+		vfh.setNormalizeBins(true);
+		vfh.setNormalizeDistance(false);
+		vfh.compute(*descriptor);
+
+		for(int j = 0; j < 308; ++j){
+			datos[i][j] = descriptor->points[0].histogram[j];
+		}
+		std::cerr << "Tamaño " << i+1 << ": " << descriptor->points[0].descriptorSize()  << std::endl;
+    	}
+	
+
+	std::cerr << ">> Done: " << tt.toc () << " ms\n";
+
+int clasificador = 0;
+std::vector<int> colorc;
+
+int ctype;
+cout << "\nPorfavor ingrese: \n1.Para entrar a red neuronal MLP\n2.Para entrar a SVC\n";
+cin >> ctype;
+  	
+if(ctype == 1){	
+//---------------------RED---------------//
+    cout << "Entro a la RED MLP" << endl;
+    //Definicion de los archivos y las variables
+    const char* Pesos_CO = "pesos/Pesos_oculta.csv";
+    const char* Bias_CO = "pesos/Bias_oculta.csv";
+    const char* Pesos_CS = "pesos/Pesos_salida.csv";
+    const char* Bias_CS = "pesos/Bias_salida.csv";
+    std::vector <std::vector <float> > X;
+    std::vector <std::vector <float> > Wco;
+    std::vector <std::vector <float> > bco;
+    std::vector <std::vector <float> > Wcs;
+    std::vector <std::vector <float> > bcs;
+    std::vector <std::vector <float> > OutputCo;
+    std::vector <std::vector <float> > Output;
+    float error;
+
+    //Lectura de todos los datos
+    Wco = leer_datos(Pesos_CO, ',', 308, 30);//308, 12 --- 308, 30
+    bco = leer_datos(Bias_CO, ',', 30, 1);//12, 1 --- 30, 1
+    Wcs = leer_datos(Pesos_CS, ',', 30, 4);//12, 3 --- 30, 4
+    bcs = leer_datos(Bias_CS, ',', 4, 1);//3, 1 ---- 4, 1
+    //Se transponen los bias de capa oculta y de capa de salida
+    bco = transpose(bco);
+    bcs = transpose(bcs);
+    int pos;
+
+    //Almacenamiento de los vectores de entrada
+    X = datos;
+    //Almacenamiento de la salida estimada sin codificar
+
+	
+	
+	/*int clasificador = 0;
+	std::vector<int> colorc;*/
+
+
+    for (int i = 0; i < fil_size(X); ++i)
+    {
+        OutputCo = tan_h(mat_sum(mat_mult(grab_data(X,i,i+1,0,308),Wco),bco));//Si entrego solo un vector de una fila pongo X sin grab_data
+        Output = sigmoid(mat_sum(mat_mult(OutputCo,Wcs),bcs));
+
+pos = get_maxnumberposition(Output);
+//cout << "Posicion de mayor numero es:" << pos << endl;
+
+        cout << "Porcentajes:" << '[' << (Output[0][0])*100 << "% ," << (Output[0][1])*100 << "% ," << (Output[0][2])*100 << "% ," << (Output[0][3])*100 << "%]" << endl;
+
+        if (pos == 0)
+        {
+            cout << "Objeto: Silla" << endl;
+	    clasificador = 1;   		
+        }
+        else if (pos == 1)
+        {
+            cout << "Objeto: Mesa" << endl;
+	    clasificador = 2;
+        }
+        else if (pos == 2)
+        {
+            cout << "Objeto: Mueble" << endl;
+	    clasificador = 3;
+        }
+        else if (pos == 3)
+	{
+	    cout << "Objeto: Desconocido" << endl;
+	    clasificador = 0;
+	}
+	
+
+        imp_mat(Output, "Salida: ");
+	
+	colorc.push_back(clasificador);//guardar cada cluster en una posicion de un vector (save)	
+        cout << "Filas: " << fil_size(Output) << "\n" << "Columnas: " << col_size(Output) << "\n" << endl;
+
+    }
+	//cout <<  << colorc.size();
+	std::cout << "tamaños= "<< colorc.size() << std::endl;
+
+
+    for (int i = 0; i < colorc.size(); ++i)
+    {
+	std::cout << "Type= "<< colorc [i] << std::endl;	
+    }	
+
+
+	//std::cout << "Objetos clasificados: "<< colorc.size() << std::endl;
+	//std::cout << "Clasificador: "<< colorc << std::endl;
+}//final if red
+//--------------------------------------//
+else if(ctype == 2){
+//---------------------SVM---------------//
+    cout << "Entro al SVC" << endl;
+    const char* Pesos = "pesos/Weights_SVM.csv";
+    std::vector <std::vector <float> > X;
+    std::vector <std::vector <float> > Weights;
+    std::vector <float> Output;
+    int indice;
+
+    Weights = leer_datos(Pesos, ',', 4, 308);
+
+    X = datos;
+
+    /*int clasificador = 0;
+    std::vector<int> colorc;*/
+
+    for (int i = 0; i < fil_size(X); ++i){
+
+        Output = SVC_prediccion(Weights,grab_data(X,i,i+1,0,308));
+        indice = distance(Output.begin(), max_element(Output.begin(), Output.begin() + Output.size()));
+        cout << "Salida: [" << Output[0] <<","<< Output[1] <<","<< Output[2] <<","<< Output[3] <<"]"<< endl;
+        cout << "Indice de mayor valor: " << *max_element(Output.begin(), Output.begin() + Output.size()) << " El valor del indice es: " << indice << endl;
+
+        if (indice == 0)
+        {
+            cout << "Objeto: Desconocido" << endl;
+	    clasificador = 0;
+        }
+        else if (indice == 1)
+        {
+            cout << "Objeto: Mesa" << endl;
+	    clasificador = 2;
+        }
+        else if (indice == 2)
+        {
+            cout << "Objeto: Mueble" << endl;
+	    clasificador = 3;
+        }
+        else if (indice == 3)
+        {
+            cout << "Objeto: Silla" << endl;
+	    clasificador = 1;
+        }
+
+        colorc.push_back(clasificador);//guardar cada cluster en una posicion de un vector (save)
+
+    }
+
+    std::cout << "tamaños= "<< colorc.size() << std::endl;
+
+
+    for (int i = 0; i < colorc.size(); ++i)
+    {
+	std::cout << "Type= "<< colorc [i] << std::endl;	
+    }	
+}//fin if svc
+//--------------------------------------//
+
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr clasificada(new pcl::PointCloud<pcl::PointXYZRGB>); 
+  	std::vector< pcl::PointIndices >::iterator i_clas;
+    	int k = 0;
+
+
+    	clasificada->width = cloudRGB->width;
+    	clasificada->height = cloudRGB->height;
+    	clasificada->is_dense = cloudRGB->is_dense;
+
+
+    	for (size_t i_point = 0; i_point < cloudRGB->points.size (); i_point++)
+    	{
+      	pcl::PointXYZRGB point;
+      	point.x = *(cloudRGB->points[i_point].data);
+      	point.y = *(cloudRGB->points[i_point].data + 1);
+      	point.z = *(cloudRGB->points[i_point].data + 2);
+      	point.r = 255;
+      	point.g = 255;
+      	point.b = 255;
+      	clasificada->points.push_back (point);
+    	}
+
+    	for (i_clas = cluster_indices.begin (); i_clas != cluster_indices.end (); i_clas++)
+
+    	{      	
+			
+		if (colorc [k] == 0)
+		{
+      			std::vector<int>::iterator i_point;
+			for (i_point = i_clas->indices.begin (); i_point != i_clas->indices.end (); i_point++)
+      			{
+        		int rgb;
+        		rgb = *i_point;
+			//Blanco 246-246-246
+        		clasificada->points[rgb].r = 255;
+        		clasificada->points[rgb].g = 0;
+        		clasificada->points[rgb].b = 0;
+      			}
+      		}
+
+		if (colorc [k] == 1)
+		{
+      			std::vector<int>::iterator i_point;
+			for (i_point = i_clas->indices.begin (); i_point != i_clas->indices.end (); i_point++)
+      			{
+        		int rgb;
+        		rgb = *i_point;
+			//Amarillo 237-255-033
+        		clasificada->points[rgb].r = 237;
+        		clasificada->points[rgb].g = 255;
+        		clasificada->points[rgb].b = 033;
+      			}
+      		}
+
+		if (colorc [k] == 2)
+		{
+      			std::vector<int>::iterator i_point;
+			for (i_point = i_clas->indices.begin (); i_point != i_clas->indices.end (); i_point++)
+      			{
+        		int rgb;
+        		rgb = *i_point;
+			//Azul 006-057-113
+        		clasificada->points[rgb].r = 006;
+        		clasificada->points[rgb].g = 057;
+        		clasificada->points[rgb].b = 113;
+      			}
+      		}
+
+		if (colorc [k] == 3)
+		{
+      			std::vector<int>::iterator i_point;
+			for (i_point = i_clas->indices.begin (); i_point != i_clas->indices.end (); i_point++)
+      			{
+        		int rgb;
+        		rgb = *i_point;
+			//Verde 036-231-017 
+        		clasificada->points[rgb].r = 036;
+        		clasificada->points[rgb].g = 231;
+        		clasificada->points[rgb].b = 017;
+      			}
+      		}	
+	k++;
+    	}
+
+
+
+//---------------------------------------//
+
+
+  		boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer(new pcl::visualization::PCLVisualizer("3D Viewer"));
+
+		int v1(0);
+		viewer->createViewPort (0.0,0.0,0.5,0.5,v1);
+		viewer->setBackgroundColor(0,0,0,v1); 
+		viewer->addText("Original", 10, 10, "right", v1);
+		pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> color1(cloud, 130, 130, 130);
+		viewer->addPointCloud<pcl::PointXYZ>(cloud, color1, "Original", v1);
+
+		int v2(0);
+		viewer->createViewPort (0.5,0.0,1.0,0.5,v2);
+		viewer->setBackgroundColor(0.1,0.1,0.1,v2); // background color light
+		viewer->addText("Suelo", 10, 10, "left", v2);
+		pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> color2(cloud_in, 255, 0, 0);
+		viewer->addPointCloud<pcl::PointXYZ>(cloud_in, color2, "Suelo", v2);
+/*
+                int v3(0);
+		viewer->createViewPort (0.0,0.5,0.5,1.0,v3);
+		viewer->setBackgroundColor(0,0,0,v3); // background color light
+		//viewer->addText("Suelo", 0, 10, "right",v3);
+		pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> color3(cloud_in, 0, 0, 100);
+		viewer->addPointCloud<pcl::PointXYZ>(cloud_in, color3, "New", v3);
+*/
+		int v3(0);
+		viewer->createViewPort (0.0,0.5,0.5,1.0,v3);
+		viewer->setBackgroundColor(0,0,0,v3); // background color light
+		//viewer->addText("cec", 0, 10, "left",v4);
+		pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb1(color_cloud);
+		viewer->addPointCloud<pcl::PointXYZRGB>(color_cloud, rgb1,"Cluster", v3);
+
+		int v4(0);
+		viewer->createViewPort (0.5,0.5,1.0,1.0,v4);
+		viewer->setBackgroundColor(0,0,0,v4); // background color light
+		//viewer->addText("cec", 0, 10, "left",v4);
+		pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(clasificada);
+		viewer->addPointCloud<pcl::PointXYZRGB>(clasificada, rgb,"Clasificada", v4);
+
+		
+		while (!viewer->wasStopped ())
+		{		
+      		viewer->spinOnce (100);
+      		boost::this_thread::sleep (boost::posix_time::microseconds (100000));
+		}		
+		
+ 		/*std::cerr << "Saving...\n", tt.tic ();
+  		pcl::io::savePCDFile ("output.pcd", *color_cloud);
+  		std::cerr << ">> Done: " << tt.toc () << " ms\n";*/
+
+  		return (0);
+	
+}
+
+
+int leer_filas(const char* cadena, char delimeter){
+        std::ifstream file(cadena);
+        std::string line;
+        //int Cols = 0;
+        int Fils = 0;
+
+        while(getline(file,line))
+        {
+            std::stringstream sep(line);
+            std::string value;
+            int Cols = 0;
+          
+            while(getline(sep,value,delimeter))
+            {
+               Cols++;
+            }
+            Fils++;
+        }
+        return Fils;
+}
+
+int leer_columnas(const char* cadena, char delimeter){
+        std::ifstream file(cadena);
+        std::string line;
+        int Colss = 0;
+        int Fils = 0;
+
+        while(getline(file,line))
+        {
+            std::stringstream sep(line);
+            std::string value;
+            int Cols = 0;
+          
+            while(getline(sep,value,delimeter))
+            {
+               Colss = Cols++;
+            }
+            Fils++;
+        }
+        return Colss+1;
+}
+
+std::vector <std::vector <float> > leer_datos(const char* cadena, char delimeter, int Nfilas, int Ncolumnas){
+        std::ifstream file(cadena);
+        std::string line;
+        string vect[Nfilas][Ncolumnas];
+        std::vector <std::vector <float> > numeros;
+        //int Cols = 0;
+        int Fils = 0;
+
+        numeros = crear_matriz(Nfilas, Ncolumnas);
+
+        while(getline(file,line))
+        {
+            std::stringstream sep(line);
+            std::string value;
+            int Cols = 0;
+          
+            while(getline(sep,value,delimeter))
+            {
+               //std::cout << "Value(" << value << ")\n";
+               vect[Fils][Cols] = value;
+               Cols++;
+            }
+            //std::cout << "Line Finished" << std::endl;
+            Fils++;
+        }
+
+        for(int i = 0; i < Nfilas; ++i)
+        {
+            for(int j = 0; j < Ncolumnas; ++j)
+            {
+                numeros[i][j] = atof(vect[i][j].c_str()); // string to float
+                //cout << "Posicion " << i << "," << j << ": " << numeros[i][j] << endl;
+            }            
+        }
+    return numeros;
+}
+
+std::vector <std::vector <float> > crear_matriz(int fil, int col){
+
+    std::vector <std::vector<float> > mat_zeros(fil, std::vector<float>(col, 0.0));
+    //...
+    return mat_zeros;
+}
+
+std::vector <std::vector <float> > transpose(std::vector <std::vector <float> > matrix){
+    std::vector <std::vector <float> > trans;
+    int f = fil_size(matrix);
+    int c = col_size(matrix);
+
+    trans = crear_matriz(c, f);
+
+    for(int i = 0; i < f; ++i)
+    {
+        for(int j = 0; j < c; ++j)
+        {
+           trans[j][i] = matrix[i][j];
+        }
+
+    }
+    return trans; 
+}
+
+void imp_mat(std::vector <std::vector <float> > mat, string nombre){
+    cout << "Matriz " << nombre << endl;
+    for(int i = 0; i < fil_size(mat); ++i)
+        {
+            for(int j = 0; j < col_size(mat); ++j)
+            {
+                //cout << "Fila: " << i << ", Columna: " << j << "= " << dataset[i][j] << endl;
+                cout << mat[i][j] << ",";
+                if(j == col_size(mat)-1)
+                {
+                    cout << '\n';
+                }
+            }            
+        }
+}
+
+std::vector <std::vector <float> > mat_mult(std::vector <std::vector <float> > m1, std::vector <std::vector <float> > m2){
+    int r1 = fil_size(m1);
+    int r2 = fil_size(m2);
+    int c1 = col_size(m1);
+    int c2 = col_size(m2);
+    std::vector <std::vector <float> > mult;
+
+    mult = crear_matriz(r1, c2);
+
+    if(c1 == r2){
+        //cout << "La multiplicacion resultante sera de: " << r1 << "x" << c2 << endl;
+        for(int i = 0; i < r1; ++i){
+            for(int j = 0; j < c2; ++j){
+                for(int k = 0; k < c1; ++k)
+                {
+                    mult[i][j] += m1[i][k] * m2[k][j];
+                }
+            }
+        }
+    }
+    else{
+        cout << "No corresponden las columnas de M1 con las filas de M2" << endl;
+    }
+    return mult;
+}
+
+std::vector <std::vector <float> > mat_sum(std::vector <std::vector <float> > m1, std::vector <std::vector <float> > m2){
+    int r1 = fil_size(m1);
+    int r2 = fil_size(m2);
+    int c1 = col_size(m1);
+    int c2 = col_size(m2);
+    std::vector <std::vector <float> > sum;
+
+    sum = crear_matriz(r1, c2);
+
+    if(r1 == r2 && c1 == c2){
+        //cout << "La suma resultante sera de: " << r1 << "x" << c2 << endl;
+        for(int i = 0; i < r1; ++i){
+            for(int j = 0; j < c2; ++j)
+            {
+                sum[i][j] = m1[i][j] + m2[i][j];
+            }
+        }
+    }
+    else{
+        cout << "No corresponden las filas o las columnas" << endl;
+    }
+    return sum;
+}
+
+std::vector <std::vector <float> > mat_res(std::vector <std::vector <float> > m1, std::vector <std::vector <float> > m2){
+    int r1 = fil_size(m1);
+    int r2 = fil_size(m2);
+    int c1 = col_size(m1);
+    int c2 = col_size(m2);
+    std::vector <std::vector <float> > res;
+
+    res = crear_matriz(r1, c2);
+
+    if(r1 == r2 && c1 == c2){
+        //cout << "La resta resultante sera de: " << r1 << "x" << c2 << endl;
+        for(int i = 0; i < r1; ++i){
+            for(int j = 0; j < c2; ++j)
+            {
+                res[i][j] = m1[i][j] - m2[i][j];
+            }
+        }
+    }
+    else{
+        cout << "No corresponden las filas o las columnas" << endl;
+    }
+    return res;
+}
+
+std::vector <std::vector <float> > tan_h(std::vector <std::vector <float> > m){
+    int r1 = fil_size(m);
+    int c1 = col_size(m);
+    std::vector <std::vector <float> > th;
+
+    th = crear_matriz(r1, c1);
+
+        //cout << "La tangente hiperbolica resultante sera de: " << r1 << "x" << c1 << endl;
+        for(int i = 0; i < r1; ++i){
+            for(int j = 0; j < c1; ++j)
+            {
+                th[i][j] = tanh(m[i][j]);
+            }
+        }
+
+    return th;
+}
+
+std::vector <std::vector <float> > sigmoid(std::vector <std::vector <float> > m){
+    int r1 = fil_size(m);
+    int c1 = col_size(m);
+    std::vector <std::vector <float> > sig;
+
+    sig = crear_matriz(r1, c1);
+
+        //cout << "La sigmoidal resultante sera de: " << r1 << "x" << c1 << endl;
+        for(int i = 0; i < r1; ++i){
+            for(int j = 0; j < c1; ++j)
+            {
+                sig[i][j] = 1/(1+exp(-(m[i][j])));
+            }
+        }
+
+    return sig;
+}
+
+int fil_size(std::vector <std::vector <float> > v2d){
+    int size_row = v2d.size();
+    return size_row;
+}
+
+int col_size(std::vector <std::vector <float> > v2d){
+    int size_col = v2d[0].size();
+    return size_col;
+}
+
+std::vector <std::vector <float> > grab_data(std::vector <std::vector <float> > matriz, int Fi, int Ff, int Ci, int Cf){
+    std::vector <std::vector <float> > datos;
+    datos = crear_matriz(Ff-Fi, Cf-Ci);
+
+    for(int i = 0; i < Ff-Fi; ++i){
+        for(int j = 0; j < Cf-Ci; ++j)
+        {
+            datos[i][j] = matriz[i+Fi][j+Ci];
+        }
+    }
+    
+    return datos;
+}
+
+std::vector <std::vector <float> > encode(std::vector <std::vector <float> > datos, int salidas){
+    int filas = fil_size(datos);
+    int columnas = col_size(datos);
+    std::vector <std::vector <float> > d_cod;
+
+    d_cod = crear_matriz(filas, salidas);
+
+    for (int i = 0; i < filas; ++i)
+    {
+        for (int j = 0; j < columnas; ++j)
+        {
+            if (datos[i][j] == 0)
+            {
+                d_cod[i][0] = 1;
+                d_cod[i][1] = 0;
+                d_cod[i][2] = 0;
+                d_cod[i][3] = 0;
+            }
+
+            if (datos[i][j] == 1)
+            {
+                d_cod[i][0] = 0;
+                d_cod[i][1] = 1;
+                d_cod[i][2] = 0;
+                d_cod[i][3] = 0;
+            }
+
+            if (datos[i][j] == 2)
+            {
+                d_cod[i][0] = 0;
+                d_cod[i][1] = 0;
+                d_cod[i][2] = 1;
+                d_cod[i][3] = 0;
+            }
+
+            if (datos[i][j] == 3)
+            {
+                d_cod[i][0] = 0;
+                d_cod[i][1] = 0;
+                d_cod[i][2] = 0;
+                d_cod[i][3] = 1;
+            }
+        }
+    }
+    return d_cod;
+}
+
+float average(std::vector <std::vector <float> > mat){
+    float prom = 0;
+
+    for (int i = 0; i < fil_size(mat); ++i)
+    {
+        for (int j = 0; j < col_size(mat); ++j)
+        {
+            prom += fabs(mat[i][j]);
+        }
+    }
+    prom = sqrt((prom/col_size(mat)))*100;
+    return prom;
+}
+
+float prod_punto(std::vector <std::vector <float> > m1, std::vector <std::vector <float> > m2){
+    int r1 = fil_size(m1);
+    int r2 = fil_size(m2);
+    int c1 = col_size(m1);
+    int c2 = col_size(m2);
+    float mult = 0;
+
+    if(c1 == c2 && r1 == r2){
+        //cout << "La multiplicacion resultante sera de: " << r1 << "x" << c2 << endl;
+	for(int i = 0; i < c1; ++i){
+   
+            mult += m1[0][i] * m2[0][i];
+
+    	}        
+
+    }
+    else{
+        cout << "No cumple las condiciones para realizar el producto punto" << endl;
+    }
+    return mult;
+}
+
+std::vector <float> SVC_prediccion(std::vector <std::vector <float> > weights, std::vector <std::vector <float> > datos){
+    std::vector <std::vector <float> > W1;
+    std::vector <std::vector <float> > W2;
+    std::vector <std::vector <float> > W3;
+    std::vector <std::vector <float> > W4;
+    std::vector <float> prediccion (fil_size(weights),0);
+
+    W1 = grab_data(weights,0,1,0,308);
+    W2 = grab_data(weights,1,2,0,308);
+    W3 = grab_data(weights,2,3,0,308);
+    W4 = grab_data(weights,3,4,0,308);
+
+    prediccion[0] = prod_punto(W1,datos);
+    prediccion[1] = prod_punto(W2,datos);
+    prediccion[2] = prod_punto(W3,datos);
+    prediccion[3] = prod_punto(W4,datos);
+
+    return prediccion;
+}
+
+int get_maxnumberposition(std::vector <std::vector <float> > out){
+    int fil = 1;
+    int cols = 4;
+    float mayor = 0;
+    int pos = 0;
+
+    for(int i = 0; i < cols; i++){
+	if(mayor>out[0][i]){
+	    pos = pos;
+	    mayor = mayor;
+	}
+	else{
+	    mayor = out[0][i];
+	    pos = i;
+	}
+    }
+    return pos;
+}
 
