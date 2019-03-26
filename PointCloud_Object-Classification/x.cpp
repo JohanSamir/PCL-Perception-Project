@@ -107,6 +107,47 @@ main (int argc, char** argv)
 
     filenames = pcl::console::parse_file_extension_argument (argc, argv, ".ply");
 
+    if (filenames.size () != 1)  
+	{
+    		filenames = pcl::console::parse_file_extension_argument (argc, argv, ".pcd");
+
+	if (filenames.size () != 1) 
+	{
+		return -1;
+    	} else {
+      		file_is_pcd = true;
+    	}
+  	}
+
+  	if (file_is_pcd) {
+
+    		if (pcl::io::loadPCDFile (argv[filenames[0]], *cloud) < 0)  
+		{
+      			std::cout << "Error loading point cloud " << argv[filenames[0]] << std::endl << std::endl;
+      		        return -1;
+    		}
+  		} else {
+
+    		if (pcl::io::loadPLYFile (argv[filenames[0]], *cloud) < 0)  
+		{
+      			std::cout << "Error loading point cloud " << argv[filenames[0]] << std::endl << std::endl;
+      			return -1;
+		}
+  	}
+
+	////////// FIN ---  LEER ARCHIVOS PCD Y PLY ////////////
+	
+	std::cerr << ">> Done: " << tt.toc () << " ms, " << cloud->points.size () << " points\n";
+
+
+	pcl::PassThrough<pcl::PointXYZ> passfilter;
+	passfilter.setInputCloud(cloud);	
+	passfilter.setFilterFieldName("z");
+	passfilter.setFilterLimits(0.2, 2.0);
+	passfilter.filter(*cloud_in);
+
+
+
 
 
 
