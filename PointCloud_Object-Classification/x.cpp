@@ -146,6 +146,75 @@ main (int argc, char** argv)
 	passfilter.setFilterLimits(0.2, 2.0);
 	passfilter.filter(*cloud_in);
 
+	/*	
+	std::cerr << ">> Done: " << tt.toc () << " ms, " << cloud->points.size () << " points\n";
+
+	std::cerr << "Segmentation floor...\n", tt.tic ();
+
+	pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients);
+	pcl::SACSegmentation<pcl::PointXYZ> segmentation; // se crea un objeto de segmentacion utilizando la libreria "SACSegmentation" de PCL
+	segmentation.setInputCloud(cloud_in);//La nube de puntos cargada se define como objeto entrada	
+	segmentation.setModelType(pcl::SACMODEL_PLANE);	
+	segmentation.setMethodType(pcl::SAC_RANSAC);	//metodo de segmentacion (RANSAC)
+        segmentation.setDistanceThreshold(0.04);//Se define la distancia minima del modelo
+	segmentation.setOptimizeCoefficients(true);//Se activa el rendimiento del coeficiente del modelo (opcional)
+	pcl::PointIndices::Ptr inlierIndices(new pcl::PointIndices);
+	segmentation.segment(*inlierIndices, *coefficients);
+
+	if (inlierIndices->indices.size() == 0)
+		std::cout << "No se puede hacer el plano." << std::endl;
+	else
+	{
+
+	//Nueva nube a trabajar
+
+		pcl::ExtractIndices<pcl::PointXYZ> extract(true);
+		extract.setInputCloud(cloud_in);
+		extract.setIndices(inlierIndices);
+		extract.setNegative(true);
+		extract.filter(*cloud_out);
+
+	//Segmenta el suelo
+
+		pcl::ExtractIndices<pcl::PointXYZ> extract2(true);
+  		extract2.setInputCloud(cloud_in);
+  		extract2.setIndices(inlierIndices);
+  		extract2.filter(*suelo);
+	}
+	std::cerr << ">> Done: " << tt.toc () << " ms, " << cloud_in->points.size () << " points\n";
+*/
+  	
+ 	std::cerr << "Downsampling...\n", tt.tic ();
+
+        std::cout << "PointCloud before filtering has: " << cloud->points.size () << " data points." << std::endl; 
+  
+  	pcl::VoxelGrid<pcl::PointXYZ> vg;
+  	vg.setInputCloud (cloud_in);
+  	vg.setLeafSize (0.01, 0.01, 0.01);
+  	vg.setDownsampleAllData (true);
+  	vg.filter (*cloud_out);
+
+	std::cout << "PointCloud after filtering has: " << cloud_out->points.size ()  << " data points." << std::endl;
+  	std::cerr << ">> Done: " << tt.toc () << " ms, " << cloud_out->points.size () << " points\n";
+	
+ 
+  	std::cerr << "Segmenting to clusters...\n", tt.tic ();  	
+
+  	pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ>);
+  	tree->setInputCloud (cloud_out);
+
+  	std::vector<pcl::PointIndices> cluster_indices;
+
+  	pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
+
+  	ec.setClusterTolerance (0.1); 
+  	ec.setMinClusterSize (400);
+  	ec.setMaxClusterSize (250000);
+  	ec.setSearchMethod (tree);
+  	ec.setInputCloud (cloud_out);
+  	ec.extract (cluster_indices);
+
+
 
 
 
