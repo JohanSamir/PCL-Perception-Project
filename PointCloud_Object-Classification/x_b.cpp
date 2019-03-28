@@ -216,6 +216,85 @@ main (int argc, char** argv)
 
 
 
+    int j = 1;
+
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZ>);
+  
+    for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it)
+    {
+  cloud_cluster->clear();
+        for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); ++pit)
+      
+        cloud_cluster->points.push_back (cloud_out->points[*pit]); 
+        cloud_cluster->width = cloud_cluster->points.size ();
+        cloud_cluster->height = 1;
+        cloud_cluster->is_dense = true;
+        
+        /*std::stringstream ss;
+        ss << "cluster_" << j << ".pcd";
+        writer.write<pcl::PointXYZ> (ss.str (), *cloud_cluster, false); */
+      std::cout << "Cluster: "<< j << cloud_cluster->points.size () << " points." << std::endl;
+        ++j;            
+    }
+
+    std::cerr << ">> Done: " << tt.toc () << " ms\n";
+
+  //Para cambiar el tipo de nube de puntos
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudRGB(new pcl::PointCloud<pcl::PointXYZRGB>); 
+    pcl::copyPointCloud(*cloud_out,*cloudRGB);
+
+
+
+  std::cerr << "Coloring Clusters...\n", tt.tic (); 
+
+      pcl::PointCloud<pcl::PointXYZRGB>::Ptr color_cloud (new pcl::PointCloud<pcl::PointXYZRGB>);  
+      std::vector<unsigned char> colors;
+
+      for (size_t i_segment = 0; i_segment < cluster_indices.size (); i_segment++)
+      {
+          colors.push_back (static_cast<unsigned char> (rand () % 256));
+          colors.push_back (static_cast<unsigned char> (rand () % 256));
+          colors.push_back (static_cast<unsigned char> (rand () % 256));
+      }
+
+      color_cloud->width = cloudRGB->width;
+      color_cloud->height = cloudRGB->height;
+      color_cloud->is_dense = cloudRGB->is_dense;
+
+
+  //Para cambiar el tipo de nube de puntos
+      for (size_t i_point = 0; i_point < cloudRGB->points.size (); i_point++)
+      {
+        pcl::PointXYZRGB point;
+        point.x = *(cloudRGB->points[i_point].data);
+        point.y = *(cloudRGB->points[i_point].data + 1);
+        point.z = *(cloudRGB->points[i_point].data + 2);
+        point.r = 255;
+        point.g = 255;
+        point.b = 255;
+        color_cloud->points.push_back (point);
+      }
+
+      std::vector< pcl::PointIndices >::iterator i_segment;
+      int sig_color = 0;
+
+      for (i_segment = cluster_indices.begin (); i_segment != cluster_indices.end (); i_segment++)
+      {
+          std::vector<int>::iterator i_point;
+
+          for (i_point = i_segment->indices.begin (); i_point != i_segment->indices.end (); i_point++)
+          {
+            int index;
+            index = *i_point;
+            color_cloud->points[index].r = colors[3 * sig_color];
+            color_cloud->points[index].g = colors[3 * sig_color + 1];
+            color_cloud->points[index].b = colors[3 * sig_color + 2];
+          }
+          sig_color++;
+      }
+
+
+
 
 
 
