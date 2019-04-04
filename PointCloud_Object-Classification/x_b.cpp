@@ -319,7 +319,56 @@ main (int argc, char** argv)
     std::cout << "Cluster "<< cant << ": " << cluster->points.size () << " data points." << std::endl;
     ++cant;
   }
+  
+  std::cout << "Cluster: "<< points_cluster.size() << std::endl;
 
+  std::vector<pcl::PointCloud<pcl::Normal>::Ptr> extractedNormals;
+  //pcl::PointCloud<pcl::Normal>::Ptr cluster_normals(new pcl::PointCloud<pcl::Normal>);
+  
+  for(size_t i = 0; i < points_cluster.size(); ++i)
+      {       
+    pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> normalEstimation;
+
+    normalEstimation.setInputCloud((points_cluster[i]));
+    
+
+      pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ> ());
+      normalEstimation.setSearchMethod (tree);
+    pcl::PointCloud<pcl::Normal>::Ptr cluster_normals (new pcl::PointCloud<pcl::Normal>);
+    normalEstimation.setRadiusSearch(0.03);
+    
+    normalEstimation.compute(*cluster_normals);
+
+    extractedNormals.push_back(cluster_normals);
+  }
+  
+  
+  //Se genera el vector flotante para almacenar uno por uno los valores del histograma
+  std::vector <std::vector <float> > datos;
+  datos = crear_matriz(points_cluster.size(),308);
+
+
+  for(size_t i = 0; i < points_cluster.size(); ++i)
+      {
+          pcl::PointCloud<pcl::VFHSignature308>::Ptr descriptor(new pcl::PointCloud<pcl::VFHSignature308>);
+
+          pcl::VFHEstimation<pcl::PointXYZ, pcl::Normal, pcl::VFHSignature308> vfh;
+
+    vfh.setInputCloud((points_cluster[i]));
+    vfh.setInputNormals((extractedNormals[i]));
+
+    pcl::search::KdTree<pcl::PointXYZ>::Ptr kdtree (new pcl::search::KdTree<pcl::PointXYZ> ());
+    vfh.setSearchMethod(kdtree);
+
+    vfh.setNormalizeBins(true);
+    vfh.setNormalizeDistance(false);
+    vfh.compute(*descriptor);
+
+    for(int j = 0; j < 308; ++j){
+      datos[i][j] = descriptor->points[0].histogram[j];
+    }
+    std::cerr << "Tamaño " << i+1 << ": " << descriptor->points[0].descriptorSize()  << std::endl;
+      }
 
 
 
