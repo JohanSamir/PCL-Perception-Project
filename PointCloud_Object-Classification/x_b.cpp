@@ -369,6 +369,98 @@ main (int argc, char** argv)
     }
     std::cerr << "Tamaño " << i+1 << ": " << descriptor->points[0].descriptorSize()  << std::endl;
       }
+std::cerr << ">> Done: " << tt.toc () << " ms\n";
+
+int clasificador = 0;
+std::vector<int> colorc;
+
+int ctype;
+cout << "\nPorfavor ingrese: \n1.Para entrar a red neuronal MLP\n2.Para entrar a SVC\n";
+cin >> ctype;
+    
+if(ctype == 1){ 
+//---------------------RED---------------//
+    cout << "Entro a la RED MLP" << endl;
+    //Definicion de los archivos y las variables
+    const char* Pesos_CO = "pesos/Pesos_oculta.csv";
+    const char* Bias_CO = "pesos/Bias_oculta.csv";
+    const char* Pesos_CS = "pesos/Pesos_salida.csv";
+    const char* Bias_CS = "pesos/Bias_salida.csv";
+    std::vector <std::vector <float> > X;
+    std::vector <std::vector <float> > Wco;
+    std::vector <std::vector <float> > bco;
+    std::vector <std::vector <float> > Wcs;
+    std::vector <std::vector <float> > bcs;
+    std::vector <std::vector <float> > OutputCo;
+    std::vector <std::vector <float> > Output;
+    float error;
+
+    //Lectura de todos los datos
+    Wco = leer_datos(Pesos_CO, ',', 308, 30);//308, 12 --- 308, 30
+    bco = leer_datos(Bias_CO, ',', 30, 1);//12, 1 --- 30, 1
+    Wcs = leer_datos(Pesos_CS, ',', 30, 4);//12, 3 --- 30, 4
+    bcs = leer_datos(Bias_CS, ',', 4, 1);//3, 1 ---- 4, 1
+    //Se transponen los bias de capa oculta y de capa de salida
+    bco = transpose(bco);
+    bcs = transpose(bcs);
+    int pos;
+
+    //Almacenamiento de los vectores de entrada
+    X = datos;
+    //Almacenamiento de la salida estimada sin codificar
+
+  
+  
+  /*int clasificador = 0;
+  std::vector<int> colorc;*/
+
+
+    for (int i = 0; i < fil_size(X); ++i)
+    {
+        OutputCo = tan_h(mat_sum(mat_mult(grab_data(X,i,i+1,0,308),Wco),bco));//Si entrego solo un vector de una fila pongo X sin grab_data
+        Output = sigmoid(mat_sum(mat_mult(OutputCo,Wcs),bcs));
+
+pos = get_maxnumberposition(Output);
+//cout << "Posicion de mayor numero es:" << pos << endl;
+
+        cout << "Porcentajes:" << '[' << (Output[0][0])*100 << "% ," << (Output[0][1])*100 << "% ," << (Output[0][2])*100 << "% ," << (Output[0][3])*100 << "%]" << endl;
+
+        if (pos == 0)
+        {
+            cout << "Objeto: Silla" << endl;
+      clasificador = 1;       
+        }
+        else if (pos == 1)
+        {
+            cout << "Objeto: Mesa" << endl;
+      clasificador = 2;
+        }
+        else if (pos == 2)
+        {
+            cout << "Objeto: Mueble" << endl;
+      clasificador = 3;
+        }
+        else if (pos == 3)
+  {
+      cout << "Objeto: Desconocido" << endl;
+      clasificador = 0;
+  }
+  
+
+        imp_mat(Output, "Salida: ");
+  
+  colorc.push_back(clasificador);//guardar cada cluster en una posicion de un vector (save) 
+        cout << "Filas: " << fil_size(Output) << "\n" << "Columnas: " << col_size(Output) << "\n" << endl;
+
+    }
+  //cout <<  << colorc.size();
+  std::cout << "tamaños= "<< colorc.size() << std::endl;
+
+
+    for (int i = 0; i < colorc.size(); ++i)
+    {
+  std::cout << "Type= "<< colorc [i] << std::endl;  
+    } 
 
 
 
