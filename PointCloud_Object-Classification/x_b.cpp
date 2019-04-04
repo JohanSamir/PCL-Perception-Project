@@ -293,6 +293,34 @@ main (int argc, char** argv)
           sig_color++;
       }
 
+        std::cerr << ">> Done: " << tt.toc () << " ms\n";
+
+  std::cerr << "VFH...\n", tt.tic (); 
+  
+
+  int sig_normal = 0;
+
+  std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> points_cluster;//asi
+  std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> normals;
+
+  int cant=1;
+  for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it)
+    {
+      pcl::PointCloud<pcl::PointXYZ>::Ptr cluster (new pcl::PointCloud<pcl::PointXYZ>);
+  
+    for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); ++pit)
+      
+    cluster->points.push_back (cloud_out->points[*pit]); 
+      cluster->width = cloud_cluster->points.size ();
+      cluster->height = 1;
+      cluster->is_dense = true;
+
+    points_cluster.push_back(cluster);//guardar cada cluster en una posicion de un vector (save)    
+    std::cout << "Cluster "<< cant << ": " << cluster->points.size () << " data points." << std::endl;
+    ++cant;
+  }
+
+
 
 
 
