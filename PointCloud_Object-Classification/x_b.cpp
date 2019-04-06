@@ -608,6 +608,62 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr clasificada(new pcl::PointCloud<pcl::Poin
   k++;
       }
 
+//---------------------------------------//
+
+
+      boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer(new pcl::visualization::PCLVisualizer("3D Viewer"));
+
+    int v1(0);
+    viewer->createViewPort (0.0,0.0,0.5,0.5,v1);
+    viewer->setBackgroundColor(0,0,0,v1); 
+    viewer->addText("Original", 10, 10, "right", v1);
+    pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> color1(cloud, 130, 130, 130);
+    viewer->addPointCloud<pcl::PointXYZ>(cloud, color1, "Original", v1);
+
+    int v2(0);
+    viewer->createViewPort (0.5,0.0,1.0,0.5,v2);
+    viewer->setBackgroundColor(0.1,0.1,0.1,v2); // background color light
+    viewer->addText("Suelo", 10, 10, "left", v2);
+    pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> color2(cloud_in, 255, 0, 0);
+    viewer->addPointCloud<pcl::PointXYZ>(cloud_in, color2, "Suelo", v2);
+/*
+                int v3(0);
+    viewer->createViewPort (0.0,0.5,0.5,1.0,v3);
+    viewer->setBackgroundColor(0,0,0,v3); // background color light
+    //viewer->addText("Suelo", 0, 10, "right",v3);
+    pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> color3(cloud_in, 0, 0, 100);
+    viewer->addPointCloud<pcl::PointXYZ>(cloud_in, color3, "New", v3);
+*/
+    int v3(0);
+    viewer->createViewPort (0.0,0.5,0.5,1.0,v3);
+    viewer->setBackgroundColor(0,0,0,v3); // background color light
+    //viewer->addText("cec", 0, 10, "left",v4);
+    pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb1(color_cloud);
+    viewer->addPointCloud<pcl::PointXYZRGB>(color_cloud, rgb1,"Cluster", v3);
+
+    int v4(0);
+    viewer->createViewPort (0.5,0.5,1.0,1.0,v4);
+    viewer->setBackgroundColor(0,0,0,v4); // background color light
+    //viewer->addText("cec", 0, 10, "left",v4);
+    pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(clasificada);
+    viewer->addPointCloud<pcl::PointXYZRGB>(clasificada, rgb,"Clasificada", v4);
+
+    
+    while (!viewer->wasStopped ())
+    {   
+          viewer->spinOnce (100);
+          boost::this_thread::sleep (boost::posix_time::microseconds (100000));
+    }   
+    
+    /*std::cerr << "Saving...\n", tt.tic ();
+      pcl::io::savePCDFile ("output.pcd", *color_cloud);
+      std::cerr << ">> Done: " << tt.toc () << " ms\n";*/
+
+      return (0);
+  
+}
+
+
 
 
 
