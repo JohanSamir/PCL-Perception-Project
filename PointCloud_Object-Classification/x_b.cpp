@@ -524,6 +524,91 @@ else if(ctype == 2){
 }//fin if svc
 //--------------------------------------//
 
+pcl::PointCloud<pcl::PointXYZRGB>::Ptr clasificada(new pcl::PointCloud<pcl::PointXYZRGB>); 
+    std::vector< pcl::PointIndices >::iterator i_clas;
+      int k = 0;
+
+
+      clasificada->width = cloudRGB->width;
+      clasificada->height = cloudRGB->height;
+      clasificada->is_dense = cloudRGB->is_dense;
+
+
+      for (size_t i_point = 0; i_point < cloudRGB->points.size (); i_point++)
+      {
+        pcl::PointXYZRGB point;
+        point.x = *(cloudRGB->points[i_point].data);
+        point.y = *(cloudRGB->points[i_point].data + 1);
+        point.z = *(cloudRGB->points[i_point].data + 2);
+        point.r = 255;
+        point.g = 255;
+        point.b = 255;
+        clasificada->points.push_back (point);
+      }
+
+      for (i_clas = cluster_indices.begin (); i_clas != cluster_indices.end (); i_clas++)
+
+      {       
+      
+    if (colorc [k] == 0)
+    {
+            std::vector<int>::iterator i_point;
+      for (i_point = i_clas->indices.begin (); i_point != i_clas->indices.end (); i_point++)
+            {
+            int rgb;
+            rgb = *i_point;
+      //Blanco 246-246-246
+            clasificada->points[rgb].r = 255;
+            clasificada->points[rgb].g = 0;
+            clasificada->points[rgb].b = 0;
+            }
+          }
+
+    if (colorc [k] == 1)
+    {
+            std::vector<int>::iterator i_point;
+      for (i_point = i_clas->indices.begin (); i_point != i_clas->indices.end (); i_point++)
+            {
+            int rgb;
+            rgb = *i_point;
+      //Amarillo 237-255-033
+            clasificada->points[rgb].r = 237;
+            clasificada->points[rgb].g = 255;
+            clasificada->points[rgb].b = 033;
+            }
+          }
+
+    if (colorc [k] == 2)
+    {
+            std::vector<int>::iterator i_point;
+      for (i_point = i_clas->indices.begin (); i_point != i_clas->indices.end (); i_point++)
+            {
+            int rgb;
+            rgb = *i_point;
+      //Azul 006-057-113
+            clasificada->points[rgb].r = 006;
+            clasificada->points[rgb].g = 057;
+            clasificada->points[rgb].b = 113;
+            }
+          }
+
+    if (colorc [k] == 3)
+    {
+            std::vector<int>::iterator i_point;
+      for (i_point = i_clas->indices.begin (); i_point != i_clas->indices.end (); i_point++)
+            {
+            int rgb;
+            rgb = *i_point;
+      //Verde 036-231-017 
+            clasificada->points[rgb].r = 036;
+            clasificada->points[rgb].g = 231;
+            clasificada->points[rgb].b = 017;
+            }
+          } 
+  k++;
+      }
+
+
 
 
 
