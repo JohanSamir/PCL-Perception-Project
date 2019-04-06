@@ -462,6 +462,68 @@ pos = get_maxnumberposition(Output);
   std::cout << "Type= "<< colorc [i] << std::endl;  
     } 
 
+    //std::cout << "Objetos clasificados: "<< colorc.size() << std::endl;
+  //std::cout << "Clasificador: "<< colorc << std::endl;
+}//final if red
+//--------------------------------------//
+else if(ctype == 2){
+//---------------------SVM---------------//
+    cout << "Entro al SVC" << endl;
+    const char* Pesos = "pesos/Weights_SVM.csv";
+    std::vector <std::vector <float> > X;
+    std::vector <std::vector <float> > Weights;
+    std::vector <float> Output;
+    int indice;
+
+    Weights = leer_datos(Pesos, ',', 4, 308);
+
+    X = datos;
+
+    /*int clasificador = 0;
+    std::vector<int> colorc;*/
+
+    for (int i = 0; i < fil_size(X); ++i){
+
+        Output = SVC_prediccion(Weights,grab_data(X,i,i+1,0,308));
+        indice = distance(Output.begin(), max_element(Output.begin(), Output.begin() + Output.size()));
+        cout << "Salida: [" << Output[0] <<","<< Output[1] <<","<< Output[2] <<","<< Output[3] <<"]"<< endl;
+        cout << "Indice de mayor valor: " << *max_element(Output.begin(), Output.begin() + Output.size()) << " El valor del indice es: " << indice << endl;
+
+        if (indice == 0)
+        {
+            cout << "Objeto: Desconocido" << endl;
+      clasificador = 0;
+        }
+        else if (indice == 1)
+        {
+            cout << "Objeto: Mesa" << endl;
+      clasificador = 2;
+        }
+        else if (indice == 2)
+        {
+            cout << "Objeto: Mueble" << endl;
+      clasificador = 3;
+        }
+        else if (indice == 3)
+        {
+            cout << "Objeto: Silla" << endl;
+      clasificador = 1;
+        }
+
+        colorc.push_back(clasificador);//guardar cada cluster en una posicion de un vector (save)
+
+    }
+
+    std::cout << "tamaños= "<< colorc.size() << std::endl;
+
+
+    for (int i = 0; i < colorc.size(); ++i)
+    {
+  std::cout << "Type= "<< colorc [i] << std::endl;  
+    } 
+}//fin if svc
+//--------------------------------------//
+
 
 
 
