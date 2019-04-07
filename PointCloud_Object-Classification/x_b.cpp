@@ -663,6 +663,29 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr clasificada(new pcl::PointCloud<pcl::Poin
   
 }
 
+int leer_filas(const char* cadena, char delimeter){
+        std::ifstream file(cadena);
+        std::string line;
+        //int Cols = 0;
+        int Fils = 0;
+
+        while(getline(file,line))
+        {
+            std::stringstream sep(line);
+            std::string value;
+            int Cols = 0;
+          
+            while(getline(sep,value,delimeter))
+            {
+               Cols++;
+            }
+            Fils++;
+        }
+        return Fils;
+}
+
+
+
 
 
 
