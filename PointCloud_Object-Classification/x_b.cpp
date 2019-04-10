@@ -749,6 +749,23 @@ std::vector <std::vector <float> > crear_matriz(int fil, int col){
     return mat_zeros;
 }
 
+std::vector <std::vector <float> > transpose(std::vector <std::vector <float> > matrix){
+    std::vector <std::vector <float> > trans;
+    int f = fil_size(matrix);
+    int c = col_size(matrix);
+
+    trans = crear_matriz(c, f);
+
+    for(int i = 0; i < f; ++i)
+    {
+        for(int j = 0; j < c; ++j)
+        {
+           trans[j][i] = matrix[i][j];
+        }
+
+    }
+    return trans; 
+}
 
 
 
