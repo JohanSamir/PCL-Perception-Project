@@ -742,7 +742,12 @@ std::vector <std::vector <float> > leer_datos(const char* cadena, char delimeter
     return numeros;
 }
 
+std::vector <std::vector <float> > crear_matriz(int fil, int col){
 
+    std::vector <std::vector<float> > mat_zeros(fil, std::vector<float>(col, 0.0));
+    //...
+    return mat_zeros;
+}
 
 
 
