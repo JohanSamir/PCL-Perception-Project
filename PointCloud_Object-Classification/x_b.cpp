@@ -705,7 +705,42 @@ int leer_columnas(const char* cadena, char delimeter){
         return Colss+1;
 }
 
+std::vector <std::vector <float> > leer_datos(const char* cadena, char delimeter, int Nfilas, int Ncolumnas){
+        std::ifstream file(cadena);
+        std::string line;
+        string vect[Nfilas][Ncolumnas];
+        std::vector <std::vector <float> > numeros;
+        //int Cols = 0;
+        int Fils = 0;
 
+        numeros = crear_matriz(Nfilas, Ncolumnas);
+
+        while(getline(file,line))
+        {
+            std::stringstream sep(line);
+            std::string value;
+            int Cols = 0;
+          
+            while(getline(sep,value,delimeter))
+            {
+               //std::cout << "Value(" << value << ")\n";
+               vect[Fils][Cols] = value;
+               Cols++;
+            }
+            //std::cout << "Line Finished" << std::endl;
+            Fils++;
+        }
+
+        for(int i = 0; i < Nfilas; ++i)
+        {
+            for(int j = 0; j < Ncolumnas; ++j)
+            {
+                numeros[i][j] = atof(vect[i][j].c_str()); // string to float
+                //cout << "Posicion " << i << "," << j << ": " << numeros[i][j] << endl;
+            }            
+        }
+    return numeros;
+}
 
 
 
