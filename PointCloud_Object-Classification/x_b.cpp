@@ -684,7 +684,26 @@ int leer_filas(const char* cadena, char delimeter){
         return Fils;
 }
 
+int leer_columnas(const char* cadena, char delimeter){
+        std::ifstream file(cadena);
+        std::string line;
+        int Colss = 0;
+        int Fils = 0;
 
+        while(getline(file,line))
+        {
+            std::stringstream sep(line);
+            std::string value;
+            int Cols = 0;
+          
+            while(getline(sep,value,delimeter))
+            {
+               Colss = Cols++;
+            }
+            Fils++;
+        }
+        return Colss+1;
+}
 
 
 
