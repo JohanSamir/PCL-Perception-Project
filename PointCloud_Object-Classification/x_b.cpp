@@ -832,6 +832,15 @@ std::vector <std::vector <float> > mat_sum(std::vector <std::vector <float> > m1
     return sum;
 }
 
+std::vector <std::vector <float> > mat_res(std::vector <std::vector <float> > m1, std::vector <std::vector <float> > m2){
+    int r1 = fil_size(m1);
+    int r2 = fil_size(m2);
+    int c1 = col_size(m1);
+    int c2 = col_size(m2);
+    std::vector <std::vector <float> > res;
+
+    res = crear_matriz(r1, c2);
+
 
 
 
