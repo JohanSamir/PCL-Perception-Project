@@ -767,6 +767,23 @@ std::vector <std::vector <float> > transpose(std::vector <std::vector <float> > 
     return trans; 
 }
 
+void imp_mat(std::vector <std::vector <float> > mat, string nombre){
+    cout << "Matriz " << nombre << endl;
+    for(int i = 0; i < fil_size(mat); ++i)
+        {
+            for(int j = 0; j < col_size(mat); ++j)
+            {
+                //cout << "Fila: " << i << ", Columna: " << j << "= " << dataset[i][j] << endl;
+                cout << mat[i][j] << ",";
+                if(j == col_size(mat)-1)
+                {
+                    cout << '\n';
+                }
+            }            
+        }
+}
+
+
 
 
 
