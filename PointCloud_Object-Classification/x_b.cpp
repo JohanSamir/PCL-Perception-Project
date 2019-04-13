@@ -840,7 +840,18 @@ std::vector <std::vector <float> > mat_res(std::vector <std::vector <float> > m1
     std::vector <std::vector <float> > res;
 
     res = crear_matriz(r1, c2);
-
-
-
+       if(r1 == r2 && c1 == c2){
+        //cout << "La resta resultante sera de: " << r1 << "x" << c2 << endl;
+        for(int i = 0; i < r1; ++i){
+            for(int j = 0; j < c2; ++j)
+            {
+                res[i][j] = m1[i][j] - m2[i][j];
+            }
+        }
+    }
+    else{
+        cout << "No corresponden las filas o las columnas" << endl;
+    }
+    return res;
+}
 
