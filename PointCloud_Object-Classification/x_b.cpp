@@ -876,5 +876,16 @@ std::vector <std::vector <float> > sigmoid(std::vector <std::vector <float> > m)
     int r1 = fil_size(m);
     int c1 = col_size(m);
     std::vector <std::vector <float> > sig;
+    sig = crear_matriz(r1, c1);
 
+        //cout << "La sigmoidal resultante sera de: " << r1 << "x" << c1 << endl;
+        for(int i = 0; i < r1; ++i){
+            for(int j = 0; j < c1; ++j)
+            {
+                sig[i][j] = 1/(1+exp(-(m[i][j])));
+            }
+        }
+
+    return sig;
+}
 
