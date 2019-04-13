@@ -889,3 +889,12 @@ std::vector <std::vector <float> > sigmoid(std::vector <std::vector <float> > m)
     return sig;
 }
 
+int fil_size(std::vector <std::vector <float> > v2d){
+    int size_row = v2d.size();
+    return size_row;
+}
+
+int col_size(std::vector <std::vector <float> > v2d){
+    int size_col = v2d[0].size();
+    return size_col;
+}
