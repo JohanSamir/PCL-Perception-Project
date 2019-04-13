@@ -898,3 +898,64 @@ int col_size(std::vector <std::vector <float> > v2d){
     int size_col = v2d[0].size();
     return size_col;
 }
+
+std::vector <std::vector <float> > grab_data(std::vector <std::vector <float> > matriz, int Fi, int Ff, int Ci, int Cf){
+    std::vector <std::vector <float> > datos;
+    datos = crear_matriz(Ff-Fi, Cf-Ci);
+
+    for(int i = 0; i < Ff-Fi; ++i){
+        for(int j = 0; j < Cf-Ci; ++j)
+        {
+            datos[i][j] = matriz[i+Fi][j+Ci];
+        }
+    }
+    
+    return datos;
+}
+
+std::vector <std::vector <float> > encode(std::vector <std::vector <float> > datos, int salidas){
+    int filas = fil_size(datos);
+    int columnas = col_size(datos);
+    std::vector <std::vector <float> > d_cod;
+
+    d_cod = crear_matriz(filas, salidas);
+
+    for (int i = 0; i < filas; ++i)
+    {
+        for (int j = 0; j < columnas; ++j)
+        {
+            if (datos[i][j] == 0)
+            {
+                d_cod[i][0] = 1;
+                d_cod[i][1] = 0;
+                d_cod[i][2] = 0;
+                d_cod[i][3] = 0;
+            }
+
+            if (datos[i][j] == 1)
+            {
+                d_cod[i][0] = 0;
+                d_cod[i][1] = 1;
+                d_cod[i][2] = 0;
+                d_cod[i][3] = 0;
+            }
+
+            if (datos[i][j] == 2)
+            {
+                d_cod[i][0] = 0;
+                d_cod[i][1] = 0;
+                d_cod[i][2] = 1;
+                d_cod[i][3] = 0;
+            }
+
+            if (datos[i][j] == 3)
+            {
+                d_cod[i][0] = 0;
+                d_cod[i][1] = 0;
+                d_cod[i][2] = 0;
+                d_cod[i][3] = 1;
+            }
+        }
+    }
+    return d_cod;
+}
