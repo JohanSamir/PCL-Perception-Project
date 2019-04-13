@@ -855,3 +855,10 @@ std::vector <std::vector <float> > mat_res(std::vector <std::vector <float> > m1
     return res;
 }
 
+td::vector <std::vector <float> > tan_h(std::vector <std::vector <float> > m){
+    int r1 = fil_size(m);
+    int c1 = col_size(m);
+    std::vector <std::vector <float> > th;
+
+    th = crear_matriz(r1, c1);
+
