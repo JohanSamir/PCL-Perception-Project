@@ -861,4 +861,20 @@ td::vector <std::vector <float> > tan_h(std::vector <std::vector <float> > m){
     std::vector <std::vector <float> > th;
 
     th = crear_matriz(r1, c1);
+    //cout << "La tangente hiperbolica resultante sera de: " << r1 << "x" << c1 << endl;
+        for(int i = 0; i < r1; ++i){
+            for(int j = 0; j < c1; ++j)
+            {
+                th[i][j] = tanh(m[i][j]);
+            }
+        }
+
+    return th;
+}
+
+std::vector <std::vector <float> > sigmoid(std::vector <std::vector <float> > m){
+    int r1 = fil_size(m);
+    int c1 = col_size(m);
+    std::vector <std::vector <float> > sig;
+
 
