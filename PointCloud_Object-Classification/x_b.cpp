@@ -1002,3 +1002,16 @@ std::vector <float> SVC_prediccion(std::vector <std::vector <float> > weights, s
     std::vector <std::vector <float> > W3;
     std::vector <std::vector <float> > W4;
     std::vector <float> prediccion (fil_size(weights),0);
+    
+    W1 = grab_data(weights,0,1,0,308);
+    W2 = grab_data(weights,1,2,0,308);
+    W3 = grab_data(weights,2,3,0,308);
+    W4 = grab_data(weights,3,4,0,308);
+
+    prediccion[0] = prod_punto(W1,datos);
+    prediccion[1] = prod_punto(W2,datos);
+    prediccion[2] = prod_punto(W3,datos);
+    prediccion[3] = prod_punto(W4,datos);
+
+    return prediccion;
+}
