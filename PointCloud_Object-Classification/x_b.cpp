@@ -959,3 +959,17 @@ std::vector <std::vector <float> > encode(std::vector <std::vector <float> > dat
     }
     return d_cod;
 }
+
+float average(std::vector <std::vector <float> > mat){
+    float prom = 0;
+
+    for (int i = 0; i < fil_size(mat); ++i)
+    {
+        for (int j = 0; j < col_size(mat); ++j)
+        {
+            prom += fabs(mat[i][j]);
+        }
+    }
+    prom = sqrt((prom/col_size(mat)))*100;
+    return prom;
+}
