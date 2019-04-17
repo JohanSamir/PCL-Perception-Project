@@ -1002,7 +1002,7 @@ std::vector <float> SVC_prediccion(std::vector <std::vector <float> > weights, s
     std::vector <std::vector <float> > W3;
     std::vector <std::vector <float> > W4;
     std::vector <float> prediccion (fil_size(weights),0);
-    
+
     W1 = grab_data(weights,0,1,0,308);
     W2 = grab_data(weights,1,2,0,308);
     W3 = grab_data(weights,2,3,0,308);
@@ -1015,3 +1015,9 @@ std::vector <float> SVC_prediccion(std::vector <std::vector <float> > weights, s
 
     return prediccion;
 }
+
+int get_maxnumberposition(std::vector <std::vector <float> > out){
+    int fil = 1;
+    int cols = 4;
+    float mayor = 0;
+    int pos = 0;
