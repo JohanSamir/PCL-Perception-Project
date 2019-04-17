@@ -973,3 +973,10 @@ float average(std::vector <std::vector <float> > mat){
     prom = sqrt((prom/col_size(mat)))*100;
     return prom;
 }
+
+float prod_punto(std::vector <std::vector <float> > m1, std::vector <std::vector <float> > m2){
+    int r1 = fil_size(m1);
+    int r2 = fil_size(m2);
+    int c1 = col_size(m1);
+    int c2 = col_size(m2);
+    float mult = 0;
