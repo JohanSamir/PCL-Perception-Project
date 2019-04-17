@@ -980,3 +980,18 @@ float prod_punto(std::vector <std::vector <float> > m1, std::vector <std::vector
     int c1 = col_size(m1);
     int c2 = col_size(m2);
     float mult = 0;
+    
+    if(c1 == c2 && r1 == r2){
+        //cout << "La multiplicacion resultante sera de: " << r1 << "x" << c2 << endl;
+  for(int i = 0; i < c1; ++i){
+   
+            mult += m1[0][i] * m2[0][i];
+
+      }        
+
+    }
+    else{
+        cout << "No cumple las condiciones para realizar el producto punto" << endl;
+    }
+    return mult;
+}
