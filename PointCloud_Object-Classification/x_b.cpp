@@ -980,7 +980,7 @@ float prod_punto(std::vector <std::vector <float> > m1, std::vector <std::vector
     int c1 = col_size(m1);
     int c2 = col_size(m2);
     float mult = 0;
-    
+
     if(c1 == c2 && r1 == r2){
         //cout << "La multiplicacion resultante sera de: " << r1 << "x" << c2 << endl;
   for(int i = 0; i < c1; ++i){
@@ -995,3 +995,10 @@ float prod_punto(std::vector <std::vector <float> > m1, std::vector <std::vector
     }
     return mult;
 }
+
+std::vector <float> SVC_prediccion(std::vector <std::vector <float> > weights, std::vector <std::vector <float> > datos){
+    std::vector <std::vector <float> > W1;
+    std::vector <std::vector <float> > W2;
+    std::vector <std::vector <float> > W3;
+    std::vector <std::vector <float> > W4;
+    std::vector <float> prediccion (fil_size(weights),0);
