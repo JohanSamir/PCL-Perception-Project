@@ -1021,3 +1021,16 @@ int get_maxnumberposition(std::vector <std::vector <float> > out){
     int cols = 4;
     float mayor = 0;
     int pos = 0;
+
+    for(int i = 0; i < cols; i++){
+  if(mayor>out[0][i]){
+      pos = pos;
+      mayor = mayor;
+  }
+  else{
+      mayor = out[0][i];
+      pos = i;
+  }
+    }
+    return pos;
+}
