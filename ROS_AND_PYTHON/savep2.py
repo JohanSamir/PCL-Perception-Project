@@ -27,10 +27,23 @@ class synchronizer:
 		
 	def callback(self, image, pointcloud):
 		cont = image.header.seq
-		nombre_img = "img"+str(cont)+".png"
+		print (cont)
+		
+		if cont<9:
+			numid = "0000" 
+			#print ('a')
+		elif cont<99:	
+			numid = "000"
+		elif cont<999:
+			numid = "00"
+		elif cont<9999:
+			numid = "0"
+
+		
+		nombre_img = "img"+numid+str(cont)+".png"
 		#nombre_point = "points"+str(cont)+".pcd"
-		nombre_point = "points"+str(cont)+".pcd"
-		nombre_pointcsv = "pointscsv"+str(cont)
+		nombre_point = "points"+str(numid)+str(cont)+".pcd"
+		nombre_pointcsv = "pointscsv"+str(numid)+str(cont)
 		#print pointcloud.data
 		try:
 			cv_image = self.bridge.imgmsg_to_cv2(image, "bgr8")
